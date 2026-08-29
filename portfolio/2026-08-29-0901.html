@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>板块量化仓位总模型 2.0｜2026-08-29 09:01</title>
+  <style>
+    :root{--bg:#f4f7fb;--card:#fff;--ink:#172033;--muted:#667085;--line:#e5eaf2;--blue:#2563eb;--green:#087f5b;--amber:#b96a00;--red:#c92a2a;--purple:#6941c6}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;line-height:1.62}
+    main{max-width:1120px;margin:auto;padding:18px}.hero{background:linear-gradient(135deg,#14213d,#243b68 60%,#3159a6);color:white;border-radius:18px;padding:26px;box-shadow:0 12px 32px #14213d22}
+    h1{font-size:27px;margin:0 0 5px}.asof{opacity:.8;font-size:13px}.tag{display:inline-block;padding:3px 9px;border-radius:999px;background:#ffffff1f;margin:10px 6px 0 0;font-size:12px}
+    h2{font-size:20px;margin:30px 0 12px}h3{font-size:16px;margin:21px 0 8px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:16px}.metric,.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 4px 16px #3440540a}.hero .metric{background:#ffffff12;border-color:#ffffff24;box-shadow:none}.metric small{display:block;color:var(--muted)}.hero .metric small{color:#d5def0}.metric b{font-size:27px}.delta{font-size:12px;margin-left:5px}.up{color:#ffcf70}.flat{color:#cbd5e1}.note{color:var(--muted);font-size:13px}.callout{border-left:4px solid var(--blue);background:#eef4ff;border-radius:8px;padding:12px 14px;margin:12px 0}.warn{border-left-color:var(--amber);background:#fff8e8}.danger{border-left-color:var(--red);background:#fff1f1}.ok{border-left-color:var(--green);background:#ecfdf3}
+    .tablewrap{overflow-x:auto;background:white;border:1px solid var(--line);border-radius:14px}table{border-collapse:collapse;width:100%;min-width:760px;font-size:13px}th,td{padding:10px 11px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}th{background:#f8fafc;color:#475467;font-weight:650}td:first-child,th:first-child{text-align:left;font-weight:650}.bar{height:8px;background:#edf0f5;border-radius:99px;overflow:hidden;min-width:90px}.bar i{display:block;height:100%;background:var(--blue);border-radius:99px}.risk i{background:var(--red)}.conf i{background:var(--purple)}
+    .pill{display:inline-block;border-radius:999px;padding:2px 8px;font-size:12px}.p-green{background:#dff7ea;color:#087f5b}.p-amber{background:#fff0cc;color:#9a5800}.p-red{background:#ffe1e1;color:#b42318}.p-blue{background:#e6efff;color:#1d4ed8}
+    .heat-low{background:#eaf7ef}.heat-mid{background:#fff1c7}.heat-high{background:#ffd9d9}.heat-self{background:#dbe8ff}.two{display:grid;grid-template-columns:1fr 1fr;gap:14px}.sector{border-top:5px solid var(--blue)}.sector.bio{border-top-color:var(--green)}.sector.power{border-top-color:var(--amber)}.sector.robot{border-top-color:var(--purple)}ul{margin:7px 0;padding-left:20px}.sources li{margin:6px 0}.small{font-size:12px}.footer{margin:28px 0 8px;color:#667085;font-size:12px;text-align:center}
+    @media(max-width:760px){main{padding:10px}.hero{padding:20px;border-radius:14px}h1{font-size:22px}.grid{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}.metric b{font-size:23px}table{font-size:12px}th,td{padding:8px}.card{padding:14px}}
+  </style>
+</head>
+<body><main>
+  <section class="hero">
+    <h1>板块量化仓位总模型 2.0</h1>
+    <div class="asof">完整基线报告｜2026-08-29 09:01（Asia/Shanghai）｜A/H 股价格截至 2026-08-28 收盘；美股与美债截至 2026-08-28 收盘</div>
+    <span class="tag">2.0 新口径基线</span><span class="tag">总仓位不加</span><span class="tag">内部风险预算重排</span>
+    <div class="grid">
+      <div class="metric"><small>总目标权益仓位</small><b>64%–68%</b><span class="delta flat">中枢 66%，不变</span></div>
+      <div class="metric"><small>组合 Buy Score</small><b>78</b><span class="delta up">较旧口径 +2</span></div>
+      <div class="metric"><small>组合 Risk Score</small><b>67</b><span class="delta up">较旧口径 +5</span></div>
+      <div class="metric"><small>组合 Confidence</small><b>73</b><span class="delta flat">中等｜新基线</span></div>
+    </div>
+  </section>
+
+  <div class="callout warn"><b>可执行结论：</b>保持 66% 左右总权益仓位，不在周一开盘追涨或一次性抄底。首次把 AI 电力/数据中心能源基础设施纳入组合，目标 7%–9%；资金优先来自超配的半导体、光模块、机器人，而不是动用现金增加总 Beta。只有实际持仓与目标中枢偏离超过 5 个百分点才交易。</div>
+
+  <h2>1. Dashboard：三周期、仓位与风险贡献</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>板块</th><th>长期 1–3年</th><th>中期 1–6月</th><th>短期 1–20日</th><th>Buy</th><th>Risk</th><th>Confidence</th><th>最终目标</th><th>中枢</th><th>风险贡献</th><th>动作</th></tr></thead>
+    <tbody>
+      <tr><td>半导体</td><td>87</td><td>82</td><td>50</td><td>79</td><td>70</td><td>80</td><td>17%–20%</td><td>19%</td><td>24%</td><td><span class="pill p-blue">核心持有</span></td></tr>
+      <tr><td>光通信 / CPO</td><td>89</td><td>88</td><td>48</td><td>80</td><td>82</td><td>79</td><td>6%–8%</td><td>7%</td><td>15%</td><td><span class="pill p-red">不追涨</span></td></tr>
+      <tr><td>创新药 Biotech</td><td>85</td><td>81</td><td>64</td><td>79</td><td>54</td><td>78</td><td>15%–18%</td><td>16%</td><td>16%</td><td><span class="pill p-green">优先核心仓</span></td></tr>
+      <tr><td>CXO / CDMO</td><td>75</td><td>80</td><td>63</td><td>75</td><td>64</td><td>77</td><td>7%–9%</td><td>8%</td><td>11%</td><td><span class="pill p-amber">政策上限</span></td></tr>
+      <tr><td>AI 电力 / 数据中心能源</td><td>88</td><td>84</td><td>57</td><td>80</td><td>68</td><td>70</td><td>7%–9%</td><td>8%</td><td>19%</td><td><span class="pill p-blue">分批新建</span></td></tr>
+      <tr><td>人形机器人 / 具身智能</td><td>82</td><td>68</td><td>52</td><td>71</td><td>70</td><td>66</td><td>7%–9%</td><td>8%</td><td>15%</td><td><span class="pill p-amber">只选兑现标的</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">Buy = 45%长期 + 35%中期 + 20%短期，未改变权重。三周期与 Confidence 为首次完整 2.0 基线，不能把“无上次分数”误读为市场突变。风险贡献为基于最终权重、相对波动和相关性带宽的估计，合计 100%，不是精确 VaR。</p>
+
+  <div class="two">
+    <div class="card"><h3>总资金分配</h3>
+      <ul><li>权益：64%–68%，中枢 66%，暂定上限 72%</li><li>现金 / 低波：32%–36%，中枢 34%</li><li>AI 高 Beta 集群：42%（半导体+光模块+AI电力+机器人）</li><li>医药集群：24%（创新药+CXO）</li></ul>
+    </div>
+    <div class="card"><h3>相较 8 月 28 日旧口径组合</h3>
+      <ul><li>总权益中枢：66% → 66%，不变</li><li>半导体 21% → 19%；光模块 8% → 7%</li><li>创新药 19% → 16%；CXO 9% → 8%</li><li>机器人 9% → 8%；AI电力 0% → 8%（新纳入）</li></ul>
+    </div>
+  </div>
+
+  <h2>2. 仓位构建分解</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>板块</th><th>战略核心</th><th>周期调整</th><th>战术调整</th><th>折扣前目标</th><th>置信度/相关性/风险折扣</th><th>最终中枢</th><th>仓位上限</th></tr></thead>
+    <tbody>
+      <tr><td>半导体</td><td>19%</td><td>+3%</td><td>-2%</td><td>20%</td><td>-1%</td><td>19%</td><td>23%</td></tr>
+      <tr><td>光通信 / CPO</td><td>10%</td><td>+2%</td><td>-2%</td><td>10%</td><td>-3%</td><td>7%</td><td>11%</td></tr>
+      <tr><td>创新药</td><td>16%</td><td>+2%</td><td>0%</td><td>18%</td><td>-2%</td><td>16%</td><td>21%</td></tr>
+      <tr><td>CXO / CDMO</td><td>9%</td><td>+1%</td><td>0%</td><td>10%</td><td>-2%</td><td>8%</td><td>11%</td></tr>
+      <tr><td>AI 电力</td><td>10%</td><td>+2%</td><td>-1%</td><td>11%</td><td>-3%</td><td>8%</td><td>13%</td></tr>
+      <tr><td>具身智能</td><td>9%</td><td>0%</td><td>-1%</td><td>8%</td><td>0%</td><td>8%</td><td>12%</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">组合 Confidence 73 属“中等”，按规则最终组合不超过折扣前目标的约 85%；再叠加共同因子和高波动折扣，折扣前约 77% 的权益意愿被压至约 66%。</p>
+
+  <h2>3. 相关性与共同因子</h2>
+  <div class="callout danger"><b>集中风险已触发：</b>AI 高 Beta 集群估计贡献约 73% 的权益风险预算，高于 60% 阈值；全球 AI/云 CapEx 共同因子贡献估计约 48%，高于 45% 阈值。因此即使半导体、光模块和 AI 电力同时高分，也不能全部加至各自上限。</div>
+  <h3>60 日相关性带宽矩阵（代理估计）</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th></th><th>半导体</th><th>光通信</th><th>创新药</th><th>CXO</th><th>AI电力</th><th>机器人</th></tr></thead>
+    <tbody>
+      <tr><td>半导体</td><td class="heat-self">1.00</td><td class="heat-high">高</td><td class="heat-low">低–中</td><td class="heat-low">低–中</td><td class="heat-mid">中–高</td><td class="heat-high">高</td></tr>
+      <tr><td>光通信</td><td class="heat-high">高</td><td class="heat-self">1.00</td><td class="heat-low">低</td><td class="heat-low">低</td><td class="heat-mid">中</td><td class="heat-high">高</td></tr>
+      <tr><td>创新药</td><td class="heat-low">低–中</td><td class="heat-low">低</td><td class="heat-self">1.00</td><td class="heat-high">中–高</td><td class="heat-low">低</td><td class="heat-low">低–中</td></tr>
+      <tr><td>CXO</td><td class="heat-low">低–中</td><td class="heat-low">低</td><td class="heat-high">中–高</td><td class="heat-self">1.00</td><td class="heat-low">低</td><td class="heat-low">低–中</td></tr>
+      <tr><td>AI电力</td><td class="heat-mid">中–高</td><td class="heat-mid">中</td><td class="heat-low">低</td><td class="heat-low">低</td><td class="heat-self">1.00</td><td class="heat-mid">中</td></tr>
+      <tr><td>机器人</td><td class="heat-high">高</td><td class="heat-high">高</td><td class="heat-low">低–中</td><td class="heat-low">低–中</td><td class="heat-mid">中</td><td class="heat-self">1.00</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">20/60/120 日代理结论：AI 硬件集群分别为高 / 高 / 中高；创新药–CXO 为中 / 中高 / 中；医药与 AI 集群为低中 / 低中 / 低中。由于国内行业指数完整历史序列本轮不可直接核验，使用代表 ETF、核心股与全球代理的共振带宽，不给伪精确小数，并在 Confidence 中扣分。</p>
+
+  <h3>共同因子暴露</h3>
+  <div class="tablewrap"><table>
+    <thead><tr><th>因子</th><th>半导体</th><th>光通信</th><th>创新药</th><th>CXO</th><th>AI电力</th><th>机器人</th></tr></thead>
+    <tbody>
+      <tr><td>全球 AI / 云 CapEx</td><td>高</td><td>高</td><td>低</td><td>低–中</td><td>高</td><td>中</td></tr>
+      <tr><td>中国信用 / 流动性 / 增长</td><td>高</td><td>高</td><td>中–高</td><td>中</td><td>高</td><td>高</td></tr>
+      <tr><td>美债实际利率 / 成长久期</td><td>高</td><td>高</td><td>中–高</td><td>中</td><td>中–高</td><td>高</td></tr>
+      <tr><td>科技风险偏好 / 高 Beta 拥挤</td><td>高</td><td>高</td><td>中</td><td>中</td><td>中–高</td><td>高</td></tr>
+      <tr><td>半导体周期 / 电子需求</td><td>高</td><td>中–高</td><td>低</td><td>低</td><td>中</td><td>低–中</td></tr>
+      <tr><td>国产替代 / 地缘限制</td><td>高</td><td>中–高</td><td>中</td><td>高</td><td>中</td><td>中</td></tr>
+      <tr><td>Biotech 融资 / BD / 医药政策</td><td>低</td><td>低</td><td>高</td><td>高</td><td>低</td><td>低</td></tr>
+      <tr><td>电网 / 数据中心能源投资</td><td>中</td><td>中</td><td>低</td><td>低</td><td>高</td><td>低–中</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>4. 置信度拆解</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>板块</th><th>覆盖率 /25</th><th>新鲜度 /20</th><th>来源可靠 /20</th><th>证据一致 /20</th><th>独立性 /15</th><th>总分</th><th>主要扣分</th></tr></thead>
+    <tbody>
+      <tr><td>半导体</td><td>21</td><td>17</td><td>18</td><td>15</td><td>9</td><td>80</td><td>估值与资金数据不完整</td></tr>
+      <tr><td>光通信</td><td>20</td><td>17</td><td>17</td><td>16</td><td>9</td><td>79</td><td>同一 AI CapEx 证据易重复</td></tr>
+      <tr><td>创新药</td><td>20</td><td>16</td><td>17</td><td>15</td><td>10</td><td>78</td><td>管线 rNPV 与临床概率差异</td></tr>
+      <tr><td>CXO</td><td>20</td><td>17</td><td>18</td><td>14</td><td>8</td><td>77</td><td>政策尾部风险难量化</td></tr>
+      <tr><td>AI电力</td><td>17</td><td>14</td><td>16</td><td>14</td><td>9</td><td>70</td><td>A股业务纯度和订单拆分不足</td></tr>
+      <tr><td>机器人</td><td>15</td><td>15</td><td>13</td><td>13</td><td>10</td><td>66</td><td>量产、收入纯度、传闻依赖</td></tr>
+    </tbody>
+  </table></div>
+
+  <h2>5. 板块明细与触发条件</h2>
+  <div class="two">
+    <div class="card sector"><h3>半导体｜79 / 70 / 80</h3><p>晶圆代工与存储景气、AI 相关接口/先进封装支撑长期与中期；设备材料国产替代仍是战略底仓。周五 SOXX -3.22%、美债 10 年期升至 4.73%，短期分降至 50，但盈利与产业数据未被破坏，尚未构成全面减仓。</p><ul><li>加仓：板块再回撤 5%–8%，盈利预测不下修且 ETF 出现逆势申购。</li><li>减仓：先进制程/存储/封装盈利扩散转负，或估值上涨而 2027 预期不再上修。</li><li>失效：AI/电子需求与国产替代订单同时转弱。</li></ul></div>
+    <div class="card sector"><h3>光通信 / CPO｜80 / 82 / 79</h3><p>800G/1.6T、硅光和 CPO 的业绩兑现最强，但 Risk 仍为全组合最高。新易盛等中报验证高增，英伟达 Rubin/Spectrum-6 延续光互联需求；问题在于估值、拥挤和全球科技久期冲击。</p><ul><li>加仓：自高点回撤 12%–18%，订单与毛利率预期不下修。</li><li>减仓：1.6T/CPO 放量推迟、客户 CapEx 下修或核心标的放量破位。</li><li>失效：需求从“量价齐升”切换至降价去库存。</li></ul></div>
+    <div class="card sector bio"><h3>创新药｜79 / 54 / 78</h3><p>商业化利润、全球 BD/M&amp;A 与临床数据共同支撑，且与 AI 硬件集群相关性较低，是组合的主要分散来源。短期资金兑现存在，但不改长期结构。</p><ul><li>加仓：核心公司回撤 5%–8%，临床/销售/BD 未转弱。</li><li>减仓：重磅临床失败、商业化低于预期、医保/支付政策超预期收紧。</li><li>失效：rNPV 下修扩散且融资/BD 同时转弱。</li></ul></div>
+    <div class="card sector bio"><h3>CXO / CDMO｜75 / 64 / 77</h3><p>药明康德 H1 订单、收入与指引强，经营周期已改善；但 CXO 必须单独计入海外政策和客户迁移尾部风险，不能套用创新药 rNPV 框架。</p><ul><li>加仓：海外 Biotech 融资改善、订单继续上修、政策风险边际下降。</li><li>减仓：美国限制升级、客户转单或在手订单增速明显回落。</li><li>失效：订单、产能利用率和现金流同步转弱。</li></ul></div>
+    <div class="card sector power"><h3>AI 电力 / 数据中心能源｜80 / 68 / 70</h3><p>数据中心电源、液冷、变压器/配电、电网设备与储能调节构成新板块。IEA 预计全球数据中心用电到 2030 年约翻倍；Vertiv Q2 销售同比 +24%并上调指引，说明需求已进入利润表。A股标的业务纯度与估值差异大，置信度仅中等。</p><ul><li>执行：3/3/2 三批建立 8%中枢，优先真实订单和现金流，不买泛电力概念。</li><li>加仓：海外/国内变压器、电源、液冷订单继续上修且回撤释放估值。</li><li>失效：数据中心并网/建设大幅延迟，订单取消、价格竞争和应收恶化。</li></ul></div>
+    <div class="card sector robot"><h3>人形机器人 / 具身智能｜71 / 70 / 66</h3><p>本体、执行器、丝杠、灵巧手、传感器与控制 AI 的长期空间高，但收入纯度和量产兑现仍落后于估值。短期只持有明确客户、良率与制造能力的核心供应链。</p><ul><li>加仓：量产订单、收入占比和毛利率被正式财报确认。</li><li>减仓：仅靠展会/融资/传闻上涨，或量产节奏延后。</li><li>失效：单位经济性与真实场景需求连续两个季度不改善。</li></ul></div>
+  </div>
+
+  <h2>6. 压力测试</h2>
+  <div class="tablewrap"><table>
+    <thead><tr><th>情景</th><th>受损最大</th><th>总组合方向性损失</th><th>应对</th></tr></thead>
+    <tbody>
+      <tr><td>AI CapEx 预期下修</td><td>光模块、半导体、AI电力</td><td>-7% 至 -10%</td><td>先削高拥挤光模块与高 Beta，现金升至 40%+</td></tr>
+      <tr><td>实际利率快速上行 75bp</td><td>光模块、机器人、半导体</td><td>-6% 至 -9%</td><td>不接技术性急跌，待利率与资金确认</td></tr>
+      <tr><td>人民币 / 国内流动性收紧</td><td>机器人、半导体、创新药</td><td>-6% 至 -9%</td><td>压缩小盘和低流动性标的</td></tr>
+      <tr><td>科技风险偏好下降</td><td>AI 高 Beta 集群</td><td>-7% 至 -10%</td><td>医药分散、现金缓冲；控制集群上限</td></tr>
+      <tr><td>半导体周期回落</td><td>半导体、光通信</td><td>-4% 至 -6%</td><td>由设计/存储转向现金流更稳的设备材料</td></tr>
+      <tr><td>医药政策 / 临床负面</td><td>创新药、CXO</td><td>-3% 至 -5%</td><td>单管线和单政策暴露限额，避免集中</td></tr>
+    </tbody>
+  </table></div>
+  <p class="note">损失区间是方向性压力估算，不是未来收益预测；用于比较风险集群和现金需求。最危险的仍是“高利率 + AI CapEx 预期下修”同时发生，届时 34% 现金不足以完全对冲，但足以避免被迫卖出。</p>
+
+  <h2>7. 再平衡与交易纪律</h2>
+  <div class="callout ok"><b>当前再平衡：</b>若现有组合接近上一版 21/8/19/9/9 的五板块结构，将半导体、光模块、创新药、CXO、机器人分别调向 19/7/16/8/8，并分三批建立 AI 电力 8%。若实际持仓偏差不足 5 个百分点，进入无交易区，不为口径变化制造交易成本。</div>
+  <ul>
+    <li><b>总仓加仓触发：</b>A/H 成长板块再回撤 5%–8%，但盈利预测、AI CapEx、创新药商业化和 CXO 订单未下修，且出现 ETF 逆势申购；总仓可升至 70%–72%。</li>
+    <li><b>总仓减仓触发：</b>10 年期美债持续站上 4.8%、AI 高 Beta 集群连续放量破位、或盈利下修扩散；总仓降至 55%–60%。</li>
+    <li><b>Crash Opportunity：</b>只有“异常急跌 + 基本面完整 + 资金逆势申购”三项同时满足，才允许先加 10%–15%战略风险预算；目前仅为观察状态。</li>
+    <li><b>当前最应避免：</b>把半导体、光模块、AI 电力和机器人当作四个独立分散仓位。它们本质上共享 AI CapEx、成长久期与科技风险偏好。</li>
+  </ul>
+
+  <h2>8. 数据与证据（去重后）</h2>
+  <ul class="sources">
+    <li><a href="https://home.treasury.gov/resource-center/data-chart-center/interest-rates/TextView?field_tdr_date_value=2026&amp;type=daily_treasury_yield_curve">美国财政部收益率曲线</a>：2026-08-28，10 年期 4.73%，较 8 月 27 日 4.67% 上升 6bp（正式数据）。</li>
+    <li><a href="https://www.federalreserve.gov/newsevents/speech/warsh20260828a.htm">美联储主席 Warsh 演讲</a>：2026-08-28，通胀仍偏高；同时指出 AI 建设解释了今年一半以上资本开支增长（正式讲话）。</li>
+    <li><a href="https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-second-quarter-fiscal-2027">NVIDIA FY2027 Q2</a>：收入 962 亿美元、数据中心收入 890 亿美元，分别同比 +106%/+117%，Q3 指引 1080 亿美元（公司披露）。</li>
+    <li><a href="https://www.sec.gov/Archives/edgar/data/1835632/000183563226000022/q227_8kx812026ex-991.htm">Marvell FY2027 Q2 8-K</a>：数据中心收入同比 +46%，AI 订单强；股价回落仅作为估值/拥挤确认，不重复计入基本面（监管披露）。</li>
+    <li><a href="https://www.wuxiapptec.com/news/wuxi-news/wuxi-apptec-delivers-strong-hone-twenty-twenty-six-results-and-raises-full-year-guidance-driven-by-greater-success-of-multiple-customers-products-and-crdmo-model">药明康德 2026H1</a>：收入 289 亿元、持续经营在手订单 664.3 亿元，同比 +25.2%，上调全年指引（公司披露）。</li>
+    <li><a href="https://www.iea.org/reports/energy-and-ai/energy-demand-from-ai">IEA《Energy and AI》</a>：全球数据中心用电到 2030 年约 945TWh，2024–2030 年均增速约 15%（权威产业数据）。</li>
+    <li><a href="https://investors.vertiv.com/news/news-details/2026/Vertiv-Reports-Strong-Second-Quarter-2026-with-Diluted-EPS-Growth-of-53-Adjusted-Diluted-EPS-Growth-of-60-Raises-Full-Year-2026-Guidance-Across-All-Key-Metrics/default.aspx">Vertiv 2026Q2</a>：销售同比 +24%，上调全年关键指标指引（公司披露；用于 AI 电力全球景气代理）。</li>
+    <li><a href="https://www.stcn.com/article/detail/4109880.html">光模块核心公司半年报汇总</a>：2026-08-24（主流财经媒体对正式财报的汇总）。</li>
+  </ul>
+  <p class="small note">数据纪律：公司、监管与政府披露优先；媒体只补足行业汇总，不把同一 AI CapEx/中报事件在基本面、价格和资金中重复加分。机器人与 AI 电力 A 股业务纯度、国内行业历史收益序列不足，已通过 Confidence 和仓位上限处理。模型分数为配置框架，不代表未经历史校准的精确胜率。</p>
+  <div class="footer">板块量化仓位总模型 2.0｜仅用于组合研究与风险管理，不构成收益承诺或个性化证券交易指令。</div>
+</main></body></html>
